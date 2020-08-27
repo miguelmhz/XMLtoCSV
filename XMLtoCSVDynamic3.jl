@@ -29,8 +29,8 @@ end
 function getAnswers(survey, document)
     answerArray=[]
     columnNames=[]
-    push!(answerArray, document, "latitude", "longitude", "workshop-key", "survey-key", "capturedTimestamp", "storedTimestamp")
-    push!(columnNames, "filePath", "latitude", "longitude", "workshop-key", "survey-key", "capturedTimestamp", "storedTimestamp")
+    push!(answerArray, document, 21.453643, -101.458375748, 2598, 432, 5677859435, 57684395473)
+    push!(columnNames, "filePath", "latitude", "longitude", "workshopkey", "surveykey", "capturedTimestamp", "storedTimestamp")
     for topic in eachelement(survey)
         for Nquestion in eachelement(topic)
             push!(answerArray, nodecontent(findfirst("answer", Nquestion)) )
@@ -47,29 +47,28 @@ filePath="C:\\Users\\migue\\Documents\\You-i-Lab\\SenSky\\SurveyCSV.csv"
 
 if !isfile(filePath)
    data = DataFrame(
-    filePath = [""],
-    latitude = [""],
-    longitude = [""],
-    workshopKey = [""],
-    surveyKey = [""],
-    capturedTimestamp = [""],
-    storedTimestamp = [""]
-)
-    CSV.write(filePath,data)
+    filePath = [],
+    latitude = [],
+    longitude = [],
+    workshopkey = [],
+    surveykey = [],
+    capturedTimestamp = [],
+    storedTimestamp = []
+    ) 
+else
+    data=string.(DataFrame(load(filePath)))  
 end
-if isfile(filePath)
-    df=string.(DataFrame(load(filePath)))  
-    for document in Surveys
-        if size(df)==(0, 0)
-            survey = root(readxml("$document"))
-            global DF=addRow(df, getAnswers(survey, document))
-        elseif document ∉ df[:,1] 
-            survey = root(readxml("$document"))
-            global DF=addRow(df, getAnswers(survey, document))
-        end
+
+for document in Surveys
+    survey = root(readxml("$document"))
+    if size(data)==(0, 0)
+        global DF=addRow(data, getAnswers(survey, document))
+    elseif document ∉ data[:,1] 
+        global DF=addRow(data, getAnswers(survey, document))
     end
-     CSV.write(filePath, DF)
 end
+    CSV.write(filePath, DF)
+    
           
 println("Listo :)")
 
