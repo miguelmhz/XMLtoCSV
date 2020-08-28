@@ -3,7 +3,7 @@ using EzXML
 using DataFrames
 using CSV
 using CSVFiles
-
+using DataStructures
 
 cd("C:\\Users\\migue\\Documents\\You-i-Lab\\SenSky\\EncuestasDinamicas")
 Surveys=filter!(s->occursin(r".xml", s),readdir())
@@ -27,18 +27,21 @@ function addRow(df, row)
 end
 
 function getAnswers(survey, document)
-    answerArray=[]
-    columnNames=[]
-    push!(answerArray, document, 21.453643, -101.458375748, 2598, 432, 5677859435, 57684395473)
-    push!(columnNames, "filePath", "latitude", "longitude", "workshopkey", "surveykey", "capturedTimestamp", "storedTimestamp")
+    Survey= OrderedDict(
+    "filePath" => document,
+    "latitude" => 21.453643,
+    "longitude" => -101.458375748,
+    "workshopKey" => "JFDLGFD",
+    "surveyKey" => "1",
+    "capturedTimestamp" => 5677859435,
+    "storedTimestamp" => 57684395473
+    )
     for topic in eachelement(survey)
         for Nquestion in eachelement(topic)
-            push!(answerArray, nodecontent(findfirst("answer", Nquestion)) )
-            push!(columnNames, "Q$(parse(Int, Nquestion["id"]))")
+            push!(Survey, "Q$(parse(Int, Nquestion["id"]))" => nodecontent(findfirst("answer", Nquestion)) )
         end
     end
-    answerArray=string.(answerArray)
-    Survey= Dict(columnNames .=> answerArray)
+   # answerArray=string.(answerArray)
     return Survey
 end
     
@@ -71,6 +74,8 @@ end
     
           
 println("Listo :)")
+
+
 
 
 
